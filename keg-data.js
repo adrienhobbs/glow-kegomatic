@@ -15,7 +15,7 @@ var updateKeg = (function() {
 
   var keg = app.database().ref('/keg');
 
-  var resetKeg = function() {
+  var addNew = function() {
     keg.update({
       beer_remaining: {
         pints: 40,
@@ -61,7 +61,7 @@ var updateKeg = (function() {
     return totalBeerPoured;
   };
 
-  var updateKeg = function (val) {
+  var update = function (val) {
     var activePour = getActivePour(val);
     var beerRemaining = getBeerRemaining(val);
     var totalBeerPoured = getTotalBeerPoured(val);
@@ -77,11 +77,21 @@ var updateKeg = (function() {
   var pourAPint = function () {
     updateKeg(convert.pintsToLiters(1));
   };
+  var resetActivePour = function () {
+      keg.update({
+        active_pour: {
+          pints: 0,
+          liters: 0
+        }
+      });
+  
+  }
 
   return {
-    updateKeg,
-    resetKeg,
-    pourAPint
+    update,
+    addNew,
+    pourAPint,
+    resetActivePour
   };
 
 }());

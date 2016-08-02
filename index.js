@@ -1,9 +1,12 @@
 var Gpio = require('onoff').Gpio;
 var flowIn = new Gpio(23, 'in', 'both');
 var round = require('./utility.js').round;
-var updateKeg = require('./keg-data.js');
+var Keg = require('./keg-data.js');
 
 var FlowMeter = (function() {
+
+  Keg.addNew();
+
   var pintsInALiter    = 2.11338,
       litersInAPint    = 0.473176,
       pints            = 0,
@@ -27,6 +30,7 @@ var FlowMeter = (function() {
   var resetPour = function() {
     return setTimeout(function() {
       thisPour = 0;
+      Keg.resetActivePour();
     }, 4000);
   }
 
@@ -45,10 +49,8 @@ var FlowMeter = (function() {
       instPour = flow * (clickDelta / msInASecond);
       thisPour += instPour;
       totalPour += instPour;
-      // console.log("total pour: ", round(totalPour, -2));
-      // console.log("this pour: ", round(thisPour, -2));
       console.log("total pints: ", getCurrentPour());
-      updateKeg.activePour(getCurrentPour());
+      Keg.update(getCurrentPour());
     }
     // we start a timer to reset the pour every click, which is cancelled at the beginning
     // of each click. Last click won't cancel it, and pour will be reset.
