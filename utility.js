@@ -1,4 +1,5 @@
-(function() {
+var round = (function() {
+
   /**
    * Decimal adjustment of a number.
    *
@@ -27,21 +28,25 @@
   }
 
   // Decimal round
-  if (!Math.round10) {
-    Math.round10 = function(value, exp) {
-      return decimalAdjust('round', value, exp);
-    };
-  }
+  var round = function(value, exp) {
+    return decimalAdjust('round', value, exp);
+  };
+
   // Decimal floor
-  if (!Math.floor10) {
-    Math.floor10 = function(value, exp) {
-      return decimalAdjust('floor', value, exp);
-    };
-  }
+  var floor = function(value, exp) {
+    return decimalAdjust('floor', value, exp);
+  };
+  //
   // Decimal ceil
-  if (!Math.ceil10) {
-    Math.ceil10 = function(value, exp) {
-      return decimalAdjust('ceil', value, exp);
-    };
-  }
+  var ceil = function(value, exp) {
+    return decimalAdjust('ceil', value, exp);
+  };
+
+  return {
+    round,
+    floor,
+    ceil
+  };
 })();
+
+module.exports = round; 

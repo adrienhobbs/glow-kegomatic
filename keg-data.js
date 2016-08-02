@@ -1,9 +1,11 @@
 var firebase = require('firebase');
+var round = require('./utility.js').round;
 var convert = require('./conversions');
 
 var updateKeg = (function() {
 
-  var totalPour = 0;
+  var totalBeerPoured, beerRemaining;  
+
   var app = firebase.initializeApp({ 
     apiKey: "AIzaSyC2HXKQIiXyGEmjfFcmdgIA01C5m4aF6PE",
     authDomain: "glowkeg.firebaseapp.com",
@@ -13,26 +15,73 @@ var updateKeg = (function() {
 
   var keg = app.database().ref('/keg');
 
-  keg.once('value').then(function(snapshot) {
-    totalPour = snapshot.val().total_pour;
-  });
-
-
-  var updateActivePour = function (val) {
-    console.log(totalPour);
+  var resetKeg = function() {
     keg.update({
-      active_pour: val
+      beer_remaining: {
+        pints: 40,
+        liters: 18.971
+      },
+      active_pour: {
+        pints: 0,
+        liters: 0
+      },
+      total_beer_poured: {
+        pints: 0,
+        liters: 0
+      }
     });
   };
 
-  var updateTotalPour = function (val) {
-    keg.ref('/keg').update({
-      active_pour: val
-    });
+   keg.once('value').then(function(snapshot) {
+     totalBeerPoured = snapshot.val().total_beer_poured;
+     beerRemaining = snapshot.val().beer_remaining;
+   });
+
+  var getBeerRemaining = function (beerPoured) {
+    beerRemaining = {
+      pints: convert.litersToPints(beerRemaining.liters - beerPoured),
+      liters: beerRemaining.liters - beerPoured
+    };
+
+    return beerRemaining;
+  };
+
+  var getActivePour = function (beerPoured) {
+    return {
+      pints: convert.litersToPints(beerPoured),
+      liters: beerPoured
+    };
+  };
+
+  var getTotalBeerPoured = function (beerPoured) {
+    totalBeerPoured = {
+      pints: convert.litersToPints(beerPoured) + totalBeerPoured.pints,
+      liters: beerPoured + totalBeerPoured.liters
+    };
+    return totalBeerPoured;
+  };
+
+  var updateKeg = function (val) {
+    var activePour = getActivePour(val);
+    var beerRemaining = getBeerRemaining(val);
+    var totalBeerPoured = getTotalBeerPoured(val);
+    if (activePour && beerRemaining && totalBeerPoured) {
+      keg.update({
+        active_pour: activePour,
+        beer_remaining: beerRemaining,
+        total_beer_poured: totalBeerPoured
+      });
+    }
+  };
+
+  var pourAPint = function () {
+    updateKeg(convert.pintsToLiters(1));
   };
 
   return {
-    activePour: updateActivePour
+    updateKeg,
+    resetKeg,
+    pourAPint
   };
 
 }());

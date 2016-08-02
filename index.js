@@ -1,6 +1,6 @@
 var Gpio = require('onoff').Gpio;
 var flowIn = new Gpio(23, 'in', 'both');
-var utility = require('./utility.js');
+var round = require('./utility.js').round;
 var updateKeg = require('./keg-data.js');
 
 var FlowMeter = (function() {
@@ -21,8 +21,8 @@ var FlowMeter = (function() {
       resetId;
 
   var getCurrentPour = function() {
-    return Math.round10(thisPour/pintsInALiter, -3);
-  }
+    return round(thisPour/pintsInALiter, -3);
+  };
 
   var resetPour = function() {
     return setTimeout(function() {
@@ -39,15 +39,14 @@ var FlowMeter = (function() {
 
     var currentTime = new Date().getTime();
     clickDelta = currentTime - lastClick;
-
     if (enabled && clickDelta < 1000) {
-      hertz    = msInASecond / clickDelta
-      flow     = hertz / (secondsInAMinute * 7.5)  // In Liters per second
-      instPour = flow * (clickDelta / msInASecond)
-      thisPour += instPour
-      totalPour += instPour
-      // console.log("total pour: ", Math.round10(totalPour, -2));
-      // console.log("this pour: ", Math.round10(thisPour, -2));
+      hertz    = msInASecond / clickDelta;
+      flow     = hertz / (secondsInAMinute * 7.5);  // In Liters per second
+      instPour = flow * (clickDelta / msInASecond);
+      thisPour += instPour;
+      totalPour += instPour;
+      // console.log("total pour: ", round(totalPour, -2));
+      // console.log("this pour: ", round(thisPour, -2));
       console.log("total pints: ", getCurrentPour());
       updateKeg.activePour(getCurrentPour());
     }
