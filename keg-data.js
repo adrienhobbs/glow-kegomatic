@@ -19,7 +19,8 @@ var updateKeg = (function() {
     keg.update({
       beer_remaining: {
         pints: 40,
-        liters: 18.971
+        liters: 18.971,
+        percentLeft: 100
       },
       active_pour: {
         pints: 0,
@@ -40,7 +41,8 @@ var updateKeg = (function() {
   var getBeerRemaining = function (beerPoured) {
     beerRemaining = {
       pints: convert.litersToPints(beerRemaining.liters - beerPoured),
-      liters: beerRemaining.liters - beerPoured
+      liters: beerRemaining.liters - beerPoured,
+      percentLeft: (beerRemaining.liters - beerPoured)/100
     };
 
     return beerRemaining;
