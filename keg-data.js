@@ -41,8 +41,8 @@ var updateKeg = (function() {
   var getBeerRemaining = function (beerPoured) {
     beerRemaining = {
       pints: convert.litersToPints(beerRemaining.liters - beerPoured),
-      liters: beerRemaining.liters - beerPoured,
-      percentLeft: (beerRemaining.liters - beerPoured)/100
+      liters: round((beerRemaining.liters - beerPoured), -4),
+      percentLeft: round((100 - ((beerRemaining.liters - beerPoured)/100) * 100), -3)
     };
 
     return beerRemaining;
@@ -57,8 +57,8 @@ var updateKeg = (function() {
 
   var getTotalBeerPoured = function (beerPoured) {
     totalBeerPoured = {
-      pints: convert.litersToPints(beerPoured) + totalBeerPoured.pints,
-      liters: beerPoured + totalBeerPoured.liters
+      pints: round(convert.litersToPints(beerPoured) + totalBeerPoured.pints, -2),
+      liters: round(beerPoured + totalBeerPoured.liters, -4)
     };
     return totalBeerPoured;
   };
