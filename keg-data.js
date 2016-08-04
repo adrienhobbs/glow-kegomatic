@@ -1,6 +1,7 @@
 var firebase = require('firebase');
 var round = require('./utility.js').round;
 var convert = require('./conversions');
+var sensor = require('ds18x20');
 
 var updateKeg = (function() {
 
@@ -14,6 +15,18 @@ var updateKeg = (function() {
   });
 
   var keg = app.database().ref('/keg');
+
+  var updateTemperature = function() {
+    return sensor.getAll(function(err, tempObj) {
+      var temp = 0;
+      if(!err) {
+        for (prop in tempObj) {
+          temp = tempObj[prop];
+        }
+      }
+      return (temp - 32) * (5/9);
+    });
+  };
 
   var addNew = function() {
     keg.update({
@@ -64,11 +77,13 @@ var updateKeg = (function() {
     var activePour = getActivePour(val);
     var beerRemaining = getBeerRemaining(val);
     var totalBeerPoured = getTotalBeerPoured(val);
+    var kegTemperature = updateTemperature();
     if (activePour && beerRemaining && totalBeerPoured) {
       keg.update({
         activePour: activePour,
         beerRemaining: beerRemaining,
-        totalBeerPoured: totalBeerPoured
+        totalBeerPoured: totalBeerPoured,
+        temperature: temperature
       });
     }
   };
