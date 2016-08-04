@@ -21,7 +21,7 @@ var updateKeg = (function() {
     sensor.getAll(function(err, tempObj) {
       if(!err) {
         for (prop in tempObj) {
-          kegTemperature = (tempObj[prop] - 32) * (5/9);
+          kegTemperature = (tempObj[prop] * 9/5) + 32;
         }
       }
     });
