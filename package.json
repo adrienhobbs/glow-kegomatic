@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ds18x20": "^0.2.0",
     "firebase": "^3.2.1",
     "nodemon": "^1.10.0",
     "onoff": "^1.1.1"
