@@ -83,7 +83,7 @@ var updateKeg = (function() {
         activePour: activePour,
         beerRemaining: beerRemaining,
         totalBeerPoured: totalBeerPoured,
-        temperature: temperature
+        temperature: kegTemperature
       });
     }
   };
