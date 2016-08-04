@@ -4,7 +4,7 @@ var convert = require('./conversions');
 
 var updateKeg = (function() {
 
-  var totalBeerPoured, beerRemaining;  
+  var totalBeerPoured = {pints: 0, liters: 0, gallons: 0}, beerRemaining = {liters: 0, pints: 0, gallons: 0};  
 
   var app = firebase.initializeApp({ 
     apiKey: "AIzaSyC2HXKQIiXyGEmjfFcmdgIA01C5m4aF6PE",
@@ -17,31 +17,28 @@ var updateKeg = (function() {
 
   var addNew = function() {
     keg.update({
-      beer_remaining: {
+      beerRemaining: {
         pints: 40,
         liters: 18.971,
         percentLeft: 100
       },
-      active_pour: {
-        pints: 0,
-        liters: 0
-      },
-      total_beer_poured: {
+      activePour: {
         pints: 0,
         liters: 0
       }
     });
   };
 
-   keg.once('value').then(function(snapshot) {
-     totalBeerPoured = snapshot.val().total_beer_poured;
-     beerRemaining = snapshot.val().beer_remaining;
-   });
+  keg.once('value').then(function(snapshot) {
+    totalBeerPoured = snapshot.val().totalBeerPoured;
+    beerRemaining = snapshot.val().beerRemaining;
+  });
 
   var getBeerRemaining = function (beerPoured) {
     beerRemaining = {
       pints: convert.litersToPints(beerRemaining.liters - beerPoured),
       liters: round((beerRemaining.liters - beerPoured), -4),
+      gallons: convert.litersToGallons(beerRemaining.liters - beerPoured),
       percentLeft: round((100 - ((beerRemaining.liters - beerPoured)/100) * 100), -3)
     };
 
@@ -69,25 +66,25 @@ var updateKeg = (function() {
     var totalBeerPoured = getTotalBeerPoured(val);
     if (activePour && beerRemaining && totalBeerPoured) {
       keg.update({
-        active_pour: activePour,
-        beer_remaining: beerRemaining,
-        total_beer_poured: totalBeerPoured
+        activePour: activePour,
+        beerRemaining: beerRemaining,
+        totalBeerPoured: totalBeerPoured
       });
     }
   };
 
   var pourAPint = function () {
-    updateKeg(convert.pintsToLiters(1));
+    update(convert.pintsToLiters(0.3));
   };
+
   var resetActivePour = function () {
-      keg.update({
-        active_pour: {
-          pints: 0,
-          liters: 0
-        }
-      });
-  
-  }
+    keg.update({
+      activePour: {
+        pints: 0,
+        liters: 0
+      }
+    });
+  };
 
   return {
     update,
