@@ -2,6 +2,7 @@ var convert = require('./conversions.js');
 var updateKeg = require('./keg-data.js');
 // var sensor = require('ds18x20');
 
+updateKeg.addNew();
 
 updateKeg.addNew();
 
