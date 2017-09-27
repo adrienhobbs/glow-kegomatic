@@ -32,7 +32,8 @@ var updateKeg = (function() {
       beerRemaining: {
         pints: 40,
         liters: 18.971,
-        percentLeft: 100
+        percentLeft: 100,
+gallons: 0
       },
       activePour: {
         pints: 0,

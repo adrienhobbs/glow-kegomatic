@@ -45,7 +45,7 @@ var FlowMeter = (function() {
     clickDelta = currentTime - lastClick;
     if (enabled && clickDelta < 1000) {
       hertz    = msInASecond / clickDelta;
-      flow     = hertz / (secondsInAMinute * 7.5);  // In Liters per second
+      flow     = hertz / (secondsInAMinute * 237.5);  // In Liters per second
       instPour = flow * (clickDelta / msInASecond);
       thisPour += instPour;
       totalPour += instPour;
@@ -67,7 +67,4 @@ var FlowMeter = (function() {
 
 flowIn.watch(FlowMeter.update);
 
-process.on('SIGINT', function () {
-  flowIn.unexport();
-});
 
