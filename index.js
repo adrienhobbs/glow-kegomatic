@@ -1,6 +1,8 @@
 var ads1x15 = require('node-ads1x15');
 var chip = 1; //0 for ads1015, 1 for ads1115
 
+console.log('starting up...')
+
 //Simple usage (default ADS address on pi 2b or 3):
 var adc = new ads1x15(chip);
 
@@ -15,6 +17,8 @@ var progGainAmp = '4096'; // see index.js for allowed values for your chip
 
 //somewhere to store our reading
 var reading  = 0;
+setInterval(function(){
+
 if(!adc.busy)
 {
   adc.readADCSingleEnded(channel, progGainAmp, samplesPerSecond, function(err, data) {
@@ -29,3 +33,4 @@ if(!adc.busy)
   // any other data processing code goes here...
 );
 }
+}, 3000)
