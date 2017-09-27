@@ -24,6 +24,7 @@ if(!adc.busy)
     }
     // if you made it here, then the data object contains your reading!
     reading = data;
+    console.log(reading, 'something works');
   }
   // any other data processing code goes here...
 );
