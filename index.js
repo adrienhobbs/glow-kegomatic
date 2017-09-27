@@ -1,73 +1,30 @@
-var Gpio = require('onoff').Gpio;
-var flowIn = new Gpio(23, 'in', 'both');
-var round = require('./utility.js').round;
-var Keg = require('./keg-data.js');
+var ads1x15 = require('node-ads1x15');
+var chip = 1; //0 for ads1015, 1 for ads1115
 
-var FlowMeter = (function() {
+//Simple usage (default ADS address on pi 2b or 3):
+var adc = new ads1x15(chip);
 
-  Keg.addNew();
+// Optionally i2c address as (chip, address) or (chip, address, i2c_dev)
+// So to use  /dev/i2c-0 use the line below instead...:
 
-  var pintsInALiter    = 2.11338,
-      litersInAPint    = 0.473176,
-      pints            = 0,
-      secondsInAMinute = 60,
-      msInASecond      = 1000,
-      lastClick        = 0,
-      clickDelta       = 0,
-      hertz            = 0,
-      flow             = 0,
-      thisPour         = 0,
-      totalPour        = 0,
-      enabled          = true,
-      clicks           = 0,
-      instPour,
-      resetId;
+//    var adc = new ads1x15(chip, 0x48, 'dev/i2c-0');
 
-  var getCurrentPour = function() {
-    return round(thisPour/pintsInALiter, -3);
-  };
+var channel = 0; //channel 0, 1, 2, or 3...
+var samplesPerSecond = '250'; // see index.js for allowed values for your chip
+var progGainAmp = '4096'; // see index.js for allowed values for your chip
 
-  var resetPour = function() {
-    return setTimeout(function() {
-      thisPour = 0;
-      Keg.resetActivePour();
-    }, 4000);
-  }
-
-  var update = function () {
-    clicks++;
-
-    if (resetId) {
-      clearTimeout(resetId);
+//somewhere to store our reading
+var reading  = 0;
+if(!adc.busy)
+{
+  adc.readADCSingleEnded(channel, progGainAmp, samplesPerSecond, function(err, data) {
+    if(err)  {
+      //logging / troubleshooting code goes here...
+      throw err;
     }
-
-    var currentTime = new Date().getTime();
-    clickDelta = currentTime - lastClick;
-    if (enabled && clickDelta < 1000) {
-      hertz    = msInASecond / clickDelta;
-      flow     = hertz / (secondsInAMinute * 7.5);  // In Liters per second
-      instPour = flow * (clickDelta / msInASecond);
-      thisPour += instPour;
-      totalPour += instPour;
-      console.log("total pints: ", getCurrentPour());
-      Keg.update(getCurrentPour());
-    }
-    // we start a timer to reset the pour every click, which is cancelled at the beginning
-    // of each click. Last click won't cancel it, and pour will be reset.
-
-    resetId = resetPour();
-    lastClick = currentTime;
+    // if you made it here, then the data object contains your reading!
+    reading = data;
   }
-
-  return {
-    update: update 
-  }
-
-}());
-
-flowIn.watch(FlowMeter.update);
-
-process.on('SIGINT', function () {
-  flowIn.unexport();
-});
-
+  // any other data processing code goes here...
+);
+}
